@@ -23,8 +23,8 @@ namespace OTP_Client
 	public partial class MainWindow : Window
 	{
 
-		public int secretW;
-		public int ident;
+		int secretW;
+		public int ident=0;
 		public int t = 1000;
 
 		Random rnd = new Random();
@@ -32,20 +32,56 @@ namespace OTP_Client
 		public MainWindow()
 		{
 			InitializeComponent();
-			Load();
+			if(ident == 0) Initialization();
 		}
 
-		private void Load()
+		private void SendValidation()
+		{
+			IPAddress IP = IPAddress.Parse("127.0.0.1");
+			TcpClient client = new TcpClient();
+			client.Connect(IP, 80);
+
+			int wi = H(secretW, t - ident);
+			byte[] data = Encoding.ASCII.GetBytes(ident+"☺"+wi + "");
+
+			NetworkStream stream = client.GetStream();
+
+			stream.Write(data, 0, data.Length);
+			int bytes = stream.Read(data, 0, data.Length);
+			string responseData = Encoding.ASCII.GetString(data, 0, bytes);
+			int aux = Convert.ToInt32(responseData);
+			if (ident == aux)
+			{
+				validationLabel.Content = "Not Authenticated";
+			}
+			else
+			{
+				validationLabel.Content = "Authenticated";
+			}
+
+			stream.Close();
+			client.Close();
+		}
+
+		private void Initialization()
 		{
 			IPAddress IP = IPAddress.Parse("127.0.0.1");
 			TcpClient client = new TcpClient();
 			client.Connect(IP, 80);
 			
 			secretW = rnd.Next(10000, 100000000);
-			byte[] data = Encoding.ASCII.GetBytes(secretW + "");
+			int w0 = H(secretW, t);
+			byte[] data = Encoding.ASCII.GetBytes(w0 + "");
 
 			NetworkStream stream = client.GetStream();
+
 			stream.Write(data, 0, data.Length);
+			int bytes = stream.Read(data, 0, data.Length);
+			string responseData = Encoding.ASCII.GetString(data, 0, bytes);
+			ident = Convert.ToInt32(responseData);
+
+			stream.Close();
+			client.Close();
 
 		}
 		private int H(int input, int times)
@@ -57,6 +93,11 @@ namespace OTP_Client
 				aux = (aux * aux) % N;
 			}
 			return (int) aux;
+		}
+
+		private void Button_Click(object sender, RoutedEventArgs e)
+		{
+			SendValidation();
 		}
 	}
 }
