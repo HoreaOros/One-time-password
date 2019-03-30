@@ -23,6 +23,7 @@ namespace One_Time_Password
         public MainWindow()
         {
             InitializeComponent();
+            Eratosthenes e = new Eratosthenes();
         }
     }
 }
