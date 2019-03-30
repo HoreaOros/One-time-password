@@ -32,7 +32,6 @@ namespace OTP_Client
 		public MainWindow()
 		{
 			InitializeComponent();
-			if(ident == 0) Initialization();
 		}
 
 		private void SendValidation()
@@ -42,11 +41,12 @@ namespace OTP_Client
 			client.Connect(IP, 80);
 
 			int wi = H(secretW, t - ident);
-			byte[] data = Encoding.ASCII.GetBytes(ident+"☺"+wi + "");
+			byte[] data = Encoding.ASCII.GetBytes(ident+"|"+wi + "");
 
 			NetworkStream stream = client.GetStream();
 
 			stream.Write(data, 0, data.Length);
+			data = new byte[256];
 			int bytes = stream.Read(data, 0, data.Length);
 			string responseData = Encoding.ASCII.GetString(data, 0, bytes);
 			int aux = Convert.ToInt32(responseData);
@@ -97,7 +97,8 @@ namespace OTP_Client
 
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
-			SendValidation();
+			if (ident == 0) Initialization();
+			else SendValidation();
 		}
 	}
 }
