@@ -61,7 +61,7 @@ namespace OTP_Client
             int aux = Convert.ToInt32(responseData);
             if (ident == aux)
             {
-                validationLabel.Content = "Code is not valid";
+                validationLabel.Content = "Status: Code is not valid";
             }
             else
             {

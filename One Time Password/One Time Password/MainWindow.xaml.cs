@@ -30,10 +30,9 @@ namespace One_Time_Password
     {
 		TcpListener server;
 		static char[] separators = { '|' };
-		int verificationVariable;
         int port = 5000;
 		static List<User> users = new List<User>();
-
+		static string path = "../../Users.txt";
 		public MainWindow()
         {
             InitializeComponent();
@@ -42,7 +41,7 @@ namespace One_Time_Password
 
 		private static void GetUsers()
 		{
-			StreamReader stream = new StreamReader("../../Users.txt");
+			StreamReader stream = new StreamReader(path);
 			string buffer = null;
 			while ((buffer=stream.ReadLine())!=null)
 			{
@@ -101,8 +100,9 @@ namespace One_Time_Password
 								verificationVariable = Convert.ToInt32(dataSplit[1]),
 								ident = 1
 							};
-							StreamWriter writer = new StreamWriter("../../Users.txt",true);
-							writer.WriteLine(user.Name + separators[0] + user.verificationVariable + separators[0] + user.ident);
+							
+
+							File.AppendAllText(path,user.Name + separators[0] + user.verificationVariable + separators[0] + user.ident+"\n");
 							users.Add(user);
 							foundUser = user;
 						}
@@ -118,11 +118,21 @@ namespace One_Time_Password
 						{
 							foundUser.verificationVariable = Convert.ToInt32(dataSplit[2]);
 							foundUser.ident++;
+							RewriteUsersFile();
 						}
 						byte[] byteoutput = Encoding.ASCII.GetBytes(foundUser.ident+"");
 						stream.Write(byteoutput, 0, byteoutput.Length);
 					}
 				}
+			}
+		}
+
+		private void RewriteUsersFile()
+		{
+			File.WriteAllText(path, String.Empty);
+			foreach (User user in users)
+			{
+				File.AppendAllText(path, user.Name + separators[0] + user.verificationVariable + separators[0] + user.ident+"\n");
 			}
 		}
 
