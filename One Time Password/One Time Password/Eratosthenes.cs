@@ -35,7 +35,6 @@ namespace One_Time_Password
                 if (ctr == 0 && num != 1)
                     primeNumbersList.Add(num);
             }
-            System.Windows.MessageBox.Show("done! "+primeNumbersList.Count);
         }
     }
 }

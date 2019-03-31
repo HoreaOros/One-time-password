@@ -14,7 +14,6 @@
             </Grid.ColumnDefinitions>
 
             <Button Name="StartButton" Click="StartButton_Click" Content="Start Server" Grid.Column="0"/>
-            <Button Name="StopButton" Click="StopButton_Click" Content="Stop Server" Grid.Column="1"/>
         </Grid>
 
         <ListBox Name="OutputListBox" Height="150"/>
