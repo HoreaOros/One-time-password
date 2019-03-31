@@ -5,14 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:One_Time_Password"
         mc:Ignorable="d"
-        Title="MainWindow" Height="300" Width="300" Background="#303030">
+        Title="OTP - Server" Height="300" Width="300" Background="#303030" WindowStyle="SingleBorderWindow">
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="9*"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <ListBox Name="OutputListBox" Grid.Row="0" Background="#505050"/>
-        <Button Name="StartButton" Click="StartButton_Click" Content="Start Server" Grid.Row="1"/>
+        <ListBox Name="OutputListBox" Grid.Row="0" Background="#505050" Foreground="White"/>
+        <Button Name="StartButton" Click="StartButton_Click" Content="Start Server" Grid.Row="1" Foreground="White" Background="#505050"/>
     </Grid>
 </Window>
