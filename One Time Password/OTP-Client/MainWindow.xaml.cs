@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Net;
+using System.IO;
 using System.Net.Sockets;
 
 namespace OTP_Client
@@ -26,8 +27,21 @@ namespace OTP_Client
             IPAddress IP = IPAddress.Parse("127.0.0.1");
             TcpClient client = new TcpClient();
             client.Connect(IP, port);
-			
-            secretW = rnd.Next(10000, 100000000);
+			string path = "../../" + userTextBox.Text + ".txt";
+			if (!File.Exists(path))
+			{
+				secretW = rnd.Next(10000, 100000000);
+				File.Create(path).Close();
+				File.AppendAllText(path, secretW+"");
+			}
+			else
+			{
+				string[] aux = File.ReadAllLines(path);
+				if (aux.Length==1)
+				{
+					secretW = Convert.ToInt32(aux[0]);
+				}
+			}
             int w0 = H(secretW, t);
 
 			byte[] data = Encoding.ASCII.GetBytes(userTextBox.Text + "|" + w0);
@@ -38,8 +52,8 @@ namespace OTP_Client
             int bytes = stream.Read(data, 0, data.Length);
             string responseData = Encoding.ASCII.GetString(data, 0, bytes);
             ident = Convert.ToInt32(responseData);
-            validationLabel.Content = "Initialised";
-
+            validationLabel.Content = "Status: Initialised";
+			initializeButton.Content = "Authenticate";
             stream.Close();
             client.Close();
         }
@@ -65,7 +79,7 @@ namespace OTP_Client
             }
             else
             {
-                validationLabel.Content = "Authenticated";
+                validationLabel.Content = "Status: Authenticated";
                 ident = aux;
             }
 
