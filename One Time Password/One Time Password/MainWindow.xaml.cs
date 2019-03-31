@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Net;
 using System.Net.Sockets;
+using System.IO;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
@@ -18,17 +19,44 @@ using System.Windows.Shapes;
 
 namespace One_Time_Password
 {
+	class User
+	{
+		public string Name { get; set; }
+		public int verificationVariable { get; set; }
+		public int ident { get; set; }
+	}
+
     public partial class MainWindow : Window
     {
 		TcpListener server;
-		char[] separators = { '|' };
+		static char[] separators = { '|' };
 		int verificationVariable;
         int port = 5000;
+		static List<User> users = new List<User>();
 
 		public MainWindow()
         {
             InitializeComponent();
+			GetUsers();
         }
+
+		private static void GetUsers()
+		{
+			StreamReader stream = new StreamReader("../../Users.txt");
+			string buffer = null;
+			while ((buffer=stream.ReadLine())!=null)
+			{
+				string[] aux = buffer.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+				User user = new User()
+				{
+					Name = aux[0],
+					verificationVariable = Convert.ToInt32(aux[1]),
+					ident = Convert.ToInt32(aux[2])
+				};
+				users.Add(user);
+			}
+			stream.Close();
+		}
 
 		private void StartButton_Click(object sender, RoutedEventArgs e)
 		{
@@ -62,26 +90,36 @@ namespace One_Time_Password
 						OutputListBox.Items.Add("Received: " + data);
 					}));
 					string[] dataSplit;
-					if ((dataSplit = data.Split(separators, StringSplitOptions.RemoveEmptyEntries)).Length == 1)
+					if ((dataSplit = data.Split(separators, StringSplitOptions.RemoveEmptyEntries)).Length == 2)
 					{
-						verificationVariable = Convert.ToInt32(data);
-						byte[] aux = Encoding.ASCII.GetBytes(1 + "");
+						User foundUser = null;
+						if ((foundUser = users.Find(x => x.Name == dataSplit[0])) == null)
+						{
+							User user = new User()
+							{
+								Name = dataSplit[0],
+								verificationVariable = Convert.ToInt32(dataSplit[1]),
+								ident = 1
+							};
+							StreamWriter writer = new StreamWriter("../../Users.txt",true);
+							writer.WriteLine(user.Name + separators[0] + user.verificationVariable + separators[0] + user.ident);
+							users.Add(user);
+							foundUser = user;
+						}
+						byte[] aux = Encoding.ASCII.GetBytes(foundUser.ident + "");
 						stream.Write(aux, 0, aux.Length);
+
 					}
-					else
+					else if(dataSplit.Length==3)
 					{
-						int aux1 = H(Convert.ToInt32(dataSplit[1]), 1);
-						string output = "";
-						if (aux1 == verificationVariable)
+						int aux1 = H(Convert.ToInt32(dataSplit[2]), 1);
+						User foundUser = users.Find(x => x.Name == dataSplit[0]);
+						if (aux1 == foundUser.verificationVariable)
 						{
-							verificationVariable = Convert.ToInt32(dataSplit[1]);
-							output += (Convert.ToInt32(dataSplit[0])+1)+"";
+							foundUser.verificationVariable = Convert.ToInt32(dataSplit[2]);
+							foundUser.ident++;
 						}
-						else
-						{
-							output += dataSplit[0];
-						}
-						byte[] byteoutput = Encoding.ASCII.GetBytes(output);
+						byte[] byteoutput = Encoding.ASCII.GetBytes(foundUser.ident+"");
 						stream.Write(byteoutput, 0, byteoutput.Length);
 					}
 				}

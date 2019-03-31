@@ -26,11 +26,12 @@ namespace OTP_Client
             IPAddress IP = IPAddress.Parse("127.0.0.1");
             TcpClient client = new TcpClient();
             client.Connect(IP, port);
-
+			
             secretW = rnd.Next(10000, 100000000);
             int w0 = H(secretW, t);
-            byte[] data = Encoding.ASCII.GetBytes(w0 + "");
 
+			byte[] data = Encoding.ASCII.GetBytes(userTextBox.Text + "|" + w0);
+			userTextBox.IsReadOnly = true;
             NetworkStream stream = client.GetStream();
 
             stream.Write(data, 0, data.Length);
@@ -48,10 +49,10 @@ namespace OTP_Client
             IPAddress IP = IPAddress.Parse("127.0.0.1");
             TcpClient client = new TcpClient();
             client.Connect(IP, port);
-
+			
             string wi = codeBox.Text;
 
-            byte[] data = Encoding.ASCII.GetBytes(ident + "|" + wi + "");
+			byte[] data = Encoding.ASCII.GetBytes(userTextBox.Text + "|" + ident + "|" + wi);
             NetworkStream stream = client.GetStream();
             stream.Write(data, 0, data.Length);
             data = new byte[256];
