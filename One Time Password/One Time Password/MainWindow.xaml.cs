@@ -84,7 +84,7 @@ namespace One_Time_Password
 						string output = "";
 						if (aux1 == verificationVariable)
 						{
-							verificationVariable = aux1;
+							verificationVariable = Convert.ToInt32(dataSplit[1]);
 							output += (Convert.ToInt32(dataSplit[0])+1)+"";
 						}
 						else

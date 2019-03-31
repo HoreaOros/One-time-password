@@ -40,11 +40,10 @@ namespace OTP_Client
 			TcpClient client = new TcpClient();
 			client.Connect(IP, 80);
 
-			int wi = H(secretW, t - ident);
-			byte[] data = Encoding.ASCII.GetBytes(ident+"|"+wi + "");
-
+			string wi = codeBox.Text;
+			
+			byte[] data = Encoding.ASCII.GetBytes(ident + "|" + wi + "");
 			NetworkStream stream = client.GetStream();
-
 			stream.Write(data, 0, data.Length);
 			data = new byte[256];
 			int bytes = stream.Read(data, 0, data.Length);
@@ -52,15 +51,17 @@ namespace OTP_Client
 			int aux = Convert.ToInt32(responseData);
 			if (ident == aux)
 			{
-				validationLabel.Content = "Not Authenticated";
+				validationLabel.Content = "Code is not valid";
 			}
 			else
 			{
 				validationLabel.Content = "Authenticated";
+				ident = aux;
 			}
 
 			stream.Close();
-			client.Close();
+				client.Close();
+			
 		}
 
 		private void Initialization()
@@ -79,6 +80,7 @@ namespace OTP_Client
 			int bytes = stream.Read(data, 0, data.Length);
 			string responseData = Encoding.ASCII.GetString(data, 0, bytes);
 			ident = Convert.ToInt32(responseData);
+			validationLabel.Content = "Initialised";
 
 			stream.Close();
 			client.Close();
@@ -99,6 +101,11 @@ namespace OTP_Client
 		{
 			if (ident == 0) Initialization();
 			else SendValidation();
+		}
+
+		private void GetCodeButton_Click(object sender, RoutedEventArgs e)
+		{
+			Task.Run(()=>MessageBox.Show(H(secretW, t - ident)+""));
 		}
 	}
 }
