@@ -5,17 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:One_Time_Password"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <StackPanel Margin="10">
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+        Title="MainWindow" Height="300" Width="300" Background="#303030">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="9*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-            <Button Name="StartButton" Click="StartButton_Click" Content="Start Server" Grid.Column="0"/>
-        </Grid>
-
-        <ListBox Name="OutputListBox" Height="150"/>
-    </StackPanel>
+        <ListBox Name="OutputListBox" Grid.Row="0" Background="#505050"/>
+        <Button Name="StartButton" Click="StartButton_Click" Content="Start Server" Grid.Row="1"/>
+    </Grid>
 </Window>
